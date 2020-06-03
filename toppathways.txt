@@ -1,0 +1,41 @@
+short_name	long_desc
+LIT_AT_VERT_ARF2-COL_DN	Downregulated in arf2 col (table s4 pubmedid:18599455)
+LIT_AT_BLASING_3H-MANNITOL_UP	Induced-3h-mannitol (table s 6 pubmedid:16299223)
+LIT_AT_THOMAS_OBE1I-OBE2I_VS_WT_DN	Down-regulated expressed in the obe1i obe2i mutant seedlings when compared to wild type (table s2 pubmedid:19392692)
+LIT_AT_PESARESI_STN7-1PSAD1-1MUTANT_VS_WS-2_UP	Up-regulated in the stn7-1 psae1-3 mutant compared to ws-2. (table s7 pubmedid:19706797)
+LIT_AT_PESARESI_STN7-1PSAD1-1MUTANT_VS_WS-2_DN	Down-regulated in the stn7-1 psae1-3 mutant compared to ws-2. (table s7 pubmedid:19706797)
+LIT_AT_ROMERO_SOM3_DN	Som3-down (tables4 pubmedid:18545680)
+LIT_AT_RUBIN_LBD38OX-N_VS_WT-N_DN	Down-regulated by lbd38ox -n vs. wt -n (dataset 1 pubmedid:19933203)
+LIT_AT_JUENGER_KAS-1_VS_TSU-1_DROUGHT_DIFF	Diff-excel file containing genes identified as differentially expressed at a fdr of 5% either constitutively between kas-1 and tsu-1 response to the drought treatment . (table s3 pubmedid:20302603)
+LIT_AT_DELGADO-CEREZO_COL-0_PCBMM_1D_DN	Dn_genes differentially regulated in col-0 plants at 1 day post inoculation with p. cucumerina bmm (Table S3; pubmedid: 21980142)
+LIT_AT_DELGADO-CEREZO_AGB1-1_VS_COL-0_PCBMM_1D_UP	Up_genes differentiallly regulated  in agb1-1  plants at 1 dpi with pcbmm compared with col-0 plants (Table S4; pubmedid: 21980142)
+LIT_AT_JAMBUNATHAN_ATNUDT7-1_VS_WT_12-3-1-POT-MIX_UP	Up_differentially expressed genes in atnudt7-1 versus wild-type plants growing in 12:3:1 potting mix (Table S1; pubmedid: 20704736)
+LIT_AT_VELLOSILLO_ROOT_9-HOT_VS_CONTROL_5D_DN	5d_dn_genes differentially expressed by 9-hot treatment in roots. (Table S1; pubmedid: 17369372)
+LIT_AT_FULTON_LER_VS_SLM_FLOWER_DN	dn,the 93 genes that show significant changes in expression level in all ler versus sub-like mutant (slm) comparisons. this list thus comprises the flower core target gene list (Suppl. Dataset 2; pubmedid: 19180193)
+LIT_AT_ASCENCIO-IBANEZ_EDS1PAD4-DEP_LEAF_DIFF	Eds1pad4-dep,comparisons to host pathogen pathway profiles (Table S4; pubmedid: 18650403)
+LIT_AT_TRAN_2.5-H-DEHYDRATED-AHK1_DN	Dn,genes up-regulated and down-regulated in 2.5-h dehydrated ahk1 mutant (Table S2; pubmedid: 18077346)
+LIT_AT_KOJIMA_ELO3_VS_LER_DN	Down-regulated _elo3/ler (Table S1; pubmedid: 21700721)
+LIT_AT_LI_MAXIMALLY-GLUCOSE_6H_UP	Genes induced maximally by glucose at 6 hours (343) (Table S1; pubmedid: 16424108)
+LIT_AT_LITTLE_PIERIS-BRASSICAE-OVIPOSITION_DN	Down-genes differentially regulated by pieris brassicae oviposition (Table S1; pubmedid: 17142483)
+LIT_AT_LITTLE_LESION-FORMATION_ACD2-2-MUTANT_DN	Down-genes differentially regulated by lesion formation in acd2-2 mutants (Table S5; pubmedid: 17142483)
+LIT_AT_BREEZE_CLUSTER13_LEAF-SENESCENCE_22TIMEPOINTS_DIFF	Differentially expressed during leaf senescence are shown, together with their statistical significance for differential expression based on the f test analysis (p value following mtc). genes are sorted into the cluster in which they belong following splinecluster analysis of the 22 time point data (shown in figure 3)_cluster 13 (supp dataset 1; pubmedid:21447789).
+LIT_AT_BREEZE_CLUSTER19_LEAF-SENESCENCE_22TIMEPOINTS_DIFF	Differentially expressed during leaf senescence are shown, together with their statistical significance for differential expression based on the f test analysis (p value following mtc). genes are sorted into the cluster in which they belong following splinecluster analysis of the 22 time point data (shown in figure 3)_cluster 19 (supp dataset 1; pubmedid:21447789).
+LIT_AT_BREEZE_CLUSTER22_LEAF-SENESCENCE_22TIMEPOINTS_DIFF	Differentially expressed during leaf senescence are shown, together with their statistical significance for differential expression based on the f test analysis (p value following mtc). genes are sorted into the cluster in which they belong following splinecluster analysis of the 22 time point data (shown in figure 3)_cluster 22 (supp dataset 1; pubmedid:21447789).
+LIT_AT_SKIPSEY_4-CHLORO-6-METHYL-2-PHENYLPYRIMIDINE_VS_CONTROL_DN	Down-regulated -cmpp(4-chloro-6-methyl-2-phenylpyrimidine) vs. control (table s3; pubmedid:21778235).
+LIT_AT_SKIPSEY_FENCLORIM_VS_4-CHLORO-6-METHYL-2-PHENYLPYRIMIDINE_DN	Down-regulated -fenclorim vs. cmpp(4-chloro-6-methyl-2-phenylpyrimidine) (table s4; pubmedid:21778235).
+LIT_AT_CHANG_MOCK_SHOOT_OE_VS_COL-0_UP	Up-mock_shoot_oe/col-0---differentially regulated in at least one genotype relative to the other genotypes under either mock (control) or hypoxia conditions (moesm2; pubmedid:22086331).
+LIT_AT_LI_BIO4-1_VS_BIO4-1-D-BIOTIN_UP	Significantly upregulated in bio4-1/bio4-1 complemented with d-biotin (table s1a; pubmedid:22126457).
+LIT_AT_LI_BIO4-1_VS_WT_UP	Significantly and 2 fold upregulated in bio4-1 compared to wt. (table s1b; pubmedid:22126457).
+LIT_AT_SINGH_LEAVES_OH-1-PLANT_LECRK-VI.2_DN	Down-regulated transcripts (fold change ? 2; p < 0.01, t-test, n=3 per group) in leaves from oh 1 plants versus leaves from col-0 control plants. overexpression analyses were performed with the other two lines that showed high lecrk-vi.2 expression levels and were named overexpressor high 1 and 2 (oh 1 and oh 2) (table s2; pubmedid:22427336).
+LIT_AT_SEGARRA_GROWN_PERLITE_BOTRYTIS-CINEREA_UP	Up-significant differentially expressed genes from arabidopsis plants grown in compost compared to plants grown in perlite (fc>1). (table s1; pubmedid:23405252).
+LIT_AT_PEREA-RESA_LSM1A-LSM1B-DOUBLE-MUTANT_UP	Up-regulated in the lsm1a lsm1b double mutant. (dataset s2b; pubmedid:23221597).
+LIT_AT_NG_AOX1A-REG-CONTEXT_H2O-V-AA_DIFF	Aox1a reg context --linear fold h2o v aa (table s6; pubmedid:23229550).
+LIT_AT_RASMUSSEN_COL-LERECOTYPES_SALT_TOP500_DIFF	Salt_top 500 regulated transcripts for each of the stress treatments from the combined analysis of col and ler ecotypes. (table s4; pubmedid:23447525).
+LIT_AT_NISHIYAMA_AHP2-3-5-WELL-WATERED_UP	Up-regulated genes (fold change ? 2) in ahp2,3,5-well-watered vs wt-well-watered (dataset s2a; pubmedid:23487796).
+LIT_AT_MARCHIVE_NITRATE_COL_T200_DN_NLP7-MUTANTS_WEAKER-OPPOSITE_DIFF	Down-genes that were differentially regulated by 20 min nitrate supply in the wt and that showed a weaker or opposite response to nitrate in the nlp7 mutants (dataset s4; pubmedid:23591880).
+LIT_AT_HSU_RVE8_DEX_VS_RVE8_MOCK_DN	Down-regulated genes comparing rve8_dex vs rve8_mock (file s1f; pubmedid:23638299).
+LIT_AT_LI_RSA3-1_SALT-STRESS_UP	Genes with increased expression levels in rsa3-1 under salt stress as determined by microarray analysis. (table s2; pubmedid:23571490).
+LIT_AT_PRASCH_VIRUS-STRESSED-PLANT_VS_CON_UP	Up-differentially expressed features of virus stressed plants compared to control plants (table s2; pubmedid:23753177).
+LIT_AT_SANCHEZ-VALLET_WT-INOCULATED-PCBMM_1DPI_VS_MOCK-TREATED-PLANTS_DN	Down-differentially regulated in wild-type plants inoculated with pcbmm (1 dpi) compared with mock-treated plants.  (table s2; pubmedid:23037505).
+COM_AT_WILSON_NMF_CLUSTER_5	Suppressed by pathogen. Clusters defined by non-negative matrix factorization by Wilson et al (to be published)
+COM_AT_WILSON_NMF_CLUSTER_7	Activated by Pathogen and light. Clusters defined by non-negative matrix factorization by Wilson et al (to be published)

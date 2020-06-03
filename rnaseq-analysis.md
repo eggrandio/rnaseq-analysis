@@ -15,10 +15,7 @@ Data preprocessing (done remotely in usegalaxy.org)
 4- Count reads per annotated gene (FeatureCounts): outputs
 “Feature\_count.txt” and “feature\_length.tabular” files
 
-5- Compare expression between samples (DESeq2):
-
-Based on
-<https://ucdavis-bioinformatics-training.github.io/2019_March_UCSF_mRNAseq_Workshop/>
+5- Compare expression between samples (edgeR):
 
 Load required libraries:
 
@@ -33,7 +30,6 @@ library(ComplexHeatmap)
 library(pals)
 library(ggsci)
 library(tidyverse)
-library(magrittr)
 library(splitstackshape)
 library(stringr)
 library(fgsea)
@@ -68,7 +64,8 @@ head(counts)
     ## AT1G01060 6398 6445 5707 6205 5307 4789 8054
 
 ``` r
-GeneLength = (read.delim(feature.length, row.names = 1)) #read file with length of genes to calculate RPKM, Make sure they are in the same order as the counts file
+GeneLength = (read.delim(feature.length, row.names = 1)) #read file with length of genes to calculate RPKM
+#Make sure GeneIDs are in the same order as the counts file
 
 snames = colnames(counts)
 treatment = as.factor(substr(snames, 1, 2))
@@ -83,11 +80,393 @@ d0 = calcNormFactors(d0) #Calculate normalization factors based on library size
 
 RPKM = rpkm(d0) #Calculate reads per kilobase per million reads using normalization factors
 
-RPKM_output = RPKM %>% as.data.frame %>% rownames_to_column("GeneID")
+RPKM_output = RPKM %>% 
+  as.data.frame %>% 
+  rownames_to_column("GeneID")
   
 write.table(RPKM_output, file = paste0("./output/RPKM.txt"), row.names=F, sep="\t", quote=F)
 
 d0 = d0[filterByExpr(d0), ,keep.lib.sizes=FALSE] #remove genes with low counts and recalculate library size
 
 d0 = calcNormFactors(d0) #Re-calculate normalization factors after removing genes with low amount of reads
+```
+
+Select a cut-off to remove genes without or with low amount of reads
+mapped:
+
+``` r
+#Use RPKM to define cutt-off value to remove noise of low expressed genes (see https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/)
+
+#Convert RPKM to long format data.frame
+
+RPKMdf = RPKM %>% as.data.frame %>%
+  rownames_to_column("GeneID") %>%
+  gather(!GeneID,key=treatment,value=RPKM) %>%
+  separate(treatment,into=c("treatment","replicate"),sep=2) %>% mutate_if(is.character, as.factor) %>% 
+  as_tibble 
+
+#Calculate number of genes left in each sample after each cut-off value (defined by start, end and increment)
+start = 0
+end = 10
+increment = 0.1
+
+list_RPKM_cutoff = list()
+count=0
+
+for(i in seq(start,end,increment)){
+  count = count+1
+  list_RPKM_cutoff[[count]] = RPKMdf %>% group_by(treatment,replicate) %>% 
+    summarize(!!as.character(i) := sum(RPKM>i))}
+
+Merged_list = list_RPKM_cutoff %>% reduce(inner_join, by =c("treatment","replicate"))
+
+Merged_list = Merged_list %>% gather(!c(treatment,replicate),key=threshold,value=Genes_above_threshold) %>%
+  unite(treatment,replicate,col="sample",sep="")
+
+Merged_list$threshold = as.numeric(Merged_list$threshold)
+
+plot = ggplot(Merged_list, aes(x=threshold,y=Genes_above_threshold,color=sample))+
+  geom_line(lwd = 1) + 
+  theme_bw() + 
+  theme(legend.position = "right")+
+  theme(axis.text.x = element_text(angle = 90,vjust=0.5))+
+  scale_x_continuous(name="RPKM cuttoff", breaks=seq(start,end,0.5))+
+  scale_y_continuous(name="# Genes > RPKM cutoff", limits=c(0, max(Merged_list$Genes_above_threshold)))+
+  labs(color = "Samples")+
+  guides(colour=guide_legend(ncol=2))
+
+plot
+```
+
+![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+In this case, we chose as cut-off 1 RPKM
+
+``` r
+RPKM_cutoff = 1
+
+drop = d0 %>% rpkm %>% rowMeans %>% `<`(RPKM_cutoff) %>% which #get index of genes below threshold
+
+d = d0[-drop, ,keep.lib.sizes=FALSE] #More stringent criteria to remove genes with low read counts
+
+d = calcNormFactors(d)
+```
+
+Generate MDS plot:
+
+``` r
+postscript(file="./output/MDSplot.ps",width=7.87, height=7.87)
+plotMDS(d, col = as.numeric(treatment))
+dev.off() # save plotted figure
+```
+
+    ## png 
+    ##   2
+
+To compare all the samples to control:
+
+``` r
+design = model.matrix(~treatment)
+
+d = estimateDisp(d, design, robust=TRUE)
+
+fit = glmQLFit(d, design, robust=TRUE)
+
+#colnames(fit) to select which sample type to compare to the control (intercept)
+
+qlf = glmQLFTest(fit, coef=2:4) #compares all the samples to the control (ANOVA-like test)
+
+AllvsCtrl = topTags(qlf, n = Inf) #unfiltered data
+
+AllvsCtrl_output = rownames_to_column(AllvsCtrl$table,"Gene")
+
+write.table(AllvsCtrl_output, file = paste0("./output/AllvsCtrl.txt"), row.names=F, sep="\t", quote=F)
+
+#Filter by FDR < 0.05 and at least one of the comparisons with logFC greater than 1
+
+FCts = log2(2) #set log2(Fold change) threshold
+FDRts = 0.05 #set FDR threshold
+
+Filtered_byFDR = topTags(qlf, n = Inf, p.value = FDRts)
+
+tmp = AllvsCtrl$table %>% dplyr::select(c(logFC.treatmentWT,logFC.treatmentRT,logFC.treatmentDT)) %>%
+  as.matrix %>% abs %>% rowMax %>% `>`(FCts) %>% which #Select only genes with abs(logFC)>FCts
+
+Filtered_AllvsCtrl = Filtered_byFDR[tmp,]
+
+Filtered_AllvsCtrl_output = na.omit(rownames_to_column(Filtered_AllvsCtrl$table,"Gene"))
+
+write.table(Filtered_AllvsCtrl_output, file = paste0("./output/Filtered_AllvsCtrl.txt"), row.names=F, sep="\t", quote=F)
+```
+
+Heatmap (using logFC):
+
+``` r
+### Select genes that change specifically in DT (manually)
+data = Filtered_AllvsCtrl$table
+data = data[complete.cases(data),]
+
+onlyDTup = data[which((data$logFC.treatmentWT < 1) &
+             (data$logFC.treatmentRT < 1) &
+             (data$logFC.treatmentDT > 1)),]
+
+onlyDTdn = data[which((data$logFC.treatmentWT > -1) &
+             (data$logFC.treatmentRT > -1) &
+             (data$logFC.treatmentDT < -1)),]
+
+onlyDT = rbind(onlyDTup,onlyDTdn)
+
+onlyDT = onlyDT[order(onlyDT$logFC.treatmentDT),]
+
+onlyDT = onlyDT[complete.cases(onlyDT),]
+
+### Get genes with significant change in at least one condition vs control:
+data = Filtered_AllvsCtrl$table
+data = data[complete.cases(data),]
+
+#### BUILD MATRIX FOR HEATMAP
+filtered_data = as.matrix(data[,2:4])
+filtered_data = filtered_data[order(row.names(filtered_data)), ]
+colnames(filtered_data) = c("WT","RT","DT")
+
+#Z-score by rows
+x = filtered_data
+x = as.matrix(x)
+nsamples = ncol(x)
+M = rowMeans(x, na.rm = TRUE)
+DF = nsamples - 1L
+IsNA = is.na(x)
+if (any(IsNA)) {
+  mode(IsNA) = "integer"
+  DF = DF - rowSums(IsNA)
+  DF[DF == 0L] = 1L}
+x = x - M
+V = rowSums(x^2L, na.rm = TRUE)/DF
+x = x/sqrt(V + 0.01)
+
+###Set number of clusters (use heatmap first to decide optimal number)
+clusters = 5
+
+#Generate dendrogram to make block annotation:
+dend = as.dendrogram(hclust(as.dist(1- cor(t(x))),"complete"), hang=-1)
+
+dend %>% dendextend::set("branches_k_color", k = clusters, value = pal_jco()(clusters)) %>% plot(leaflab="none")
+```
+
+![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+#Create annotation block for heatmap
+cl_num = cutree(dend, k = clusters)
+cl_col = pal_jco()(clusters)
+names(cl_col) = unique(cl_num)
+cl_col = list(cl_num=cl_col)
+
+row_ha = rowAnnotation(cl_num = cl_num,
+                       col = cl_col,
+                       annotation_legend_param = list(title = "Cluster"),
+                       show_annotation_name = F)
+
+col_lab = gt_render(c("Water","SWNTs +<br> ssRNA","PEI-SWNTs +<br> pDNA"))
+
+Heatmap(x,
+        clustering_distance_columns = "euclidean",
+        clustering_method_columns = "complete",
+        clustering_distance_rows = "pearson",
+        clustering_method_rows = "complete",
+        row_split = clusters,
+        left_annotation = row_ha,
+        show_row_names = F,
+        heatmap_legend_param = list(title = "Z-score"),
+        column_title = "Treatments",
+        row_title = "DE Genes",
+        use_raster = F,
+        column_labels = col_lab,
+        column_names_rot = 45,
+        column_names_centered = TRUE,
+        column_names_max_height = unit(6, "cm"))
+```
+
+![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+###Select interesting clusters based on the heatmap
+Cluster_UPGENES = 1
+Cluster_DNGENES = 2
+
+gnames_UPGENES = names(cl_num[which(cl_num == Cluster_UPGENES)])
+gnames_DNGENES = names(cl_num[which(cl_num == Cluster_DNGENES)])
+
+gnames_for_GSEA = c(gnames_UPGENES,gnames_DNGENES)
+
+DE_GSEA = Filtered_AllvsCtrl$table[gnames_for_GSEA,]
+```
+
+Marker genes from clusters:
+
+``` r
+### RPKM data frame in long format:
+
+RPKM = (rpkm(d,log = T))
+
+RPKMdf = RPKM %>% as.data.frame %>%
+  rownames_to_column("GeneID") %>%
+  gather(!GeneID,key=treatment,value=RPKM) %>%
+  separate(treatment,into=c("treatment","replicate"),sep=2) %>% 
+  mutate_if(is.character, as.factor) %>% 
+  as_tibble 
+
+gnames_UPGENES = names(cl_num[which(cl_num == Cluster_UPGENES)])
+gnames_DNGENES = names(cl_num[which(cl_num == Cluster_DNGENES)])
+
+#Number of up and down regulated genes to be plotted:
+ngenes = 3
+
+#Get data of up-regulated genes:
+gnames = gnames_UPGENES
+
+onlyDT_data = onlyDT[which(rownames(onlyDT) %in% gnames),]
+
+onlyDT_data = onlyDT_data[order(-(abs(onlyDT_data$logFC.treatmentDT))),]
+
+onlyDT_fdata = RPKMdf %>% filter(GeneID %in% c(head(rownames(onlyDT_data),ngenes))) %>%
+  mutate(treatment = factor(treatment, 
+                            levels = c("NT","WT","RT","DT")))
+
+oDTf_up = onlyDT_fdata
+
+#Get data of down-regulated genes:
+gnames = gnames_DNGENES
+
+onlyDT_data = onlyDT[which(rownames(onlyDT) %in% gnames),]
+
+onlyDT_data = onlyDT_data[order(-(abs(onlyDT_data$logFC.treatmentDT))),]
+
+onlyDT_fdata = RPKMdf %>% filter(GeneID %in% c(head(rownames(onlyDT_data),ngenes))) %>%
+  mutate(treatment = factor(treatment, 
+                            levels = c("NT","WT","RT","DT")))
+
+oDTf_dn = onlyDT_fdata
+
+# Merge data from up and down genes:
+
+oDTf = bind_rows(oDTf_up, oDTf_dn) %>% droplevels()
+
+#### Reorder genes (factor) by ratio DT/NT (as they are in log2, logDT-logNT):
+
+oDTf_mDT = oDTf %>% group_by(GeneID,treatment) %>%
+  filter(treatment == "DT" | treatment == "NT") %>% 
+  summarise(mean_RPKM = mean(RPKM)) %>%
+  spread(treatment, mean_RPKM) %>% 
+  summarise(ratioDT = DT-NT) %>% 
+  arrange(-ratioDT) %>% 
+  mutate(GeneID = fct_reorder(GeneID, -ratioDT)) %>% 
+  ungroup()
+
+oDTf = oDTf %>% mutate(GeneID = factor(GeneID, levels = levels(oDTf_mDT$GeneID)))
+
+### Plot data:
+ggplot(data = oDTf, aes(x = GeneID, y = RPKM, fill = treatment)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(position=position_dodge(0.75),
+              shape=21,
+              alpha=0.5,
+              aes(fill = treatment),
+              color="black")+
+  scale_y_continuous() +
+  xlab("Gene ID") + 
+  ylab("log2(RPKM)") +
+  labs(fill = "Treatment") +
+  scale_color_jco() +
+  scale_fill_jco() +
+  theme_classic()
+```
+
+![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+filename = paste0("./output/boxplot_",ngenes,"genes.svg")
+ggsave(filename)
+```
+
+    ## Saving 7 x 5 in image
+
+GSEA analysis:
+
+``` r
+###Prepare GMT file and experiment descriptions:
+AraPath_GMT = gmtPathways("./output/AraPath.gmt")
+
+AraPath_longdesc = fread("./data/GSEA gmt format-all.gmt", fill=T, na.strings="") %>% dplyr::select(c(1,2))
+
+colnames(AraPath_longdesc) = c("short_name","long_desc")
+
+GMTs = c(AraPath_GMT)
+GMT_longdesc = rbind(AraPath_longdesc)
+
+###GSEA
+genelist = DE_GSEA #Select genes that are specifically Up or Downregulated in PEI-SWNT samples
+
+ranked_genes = setNames(genelist$logFC.treatmentDT,rownames(genelist))
+
+ranked_genes = ranked_genes[order(ranked_genes)]
+
+fgseaRes = fgsea(pathways = GMTs, 
+                 stats    = ranked_genes,
+                 minSize  = 10,
+                 maxSize  = 500,
+                 nperm = 10000,
+                 nproc = 7)
+
+topPathwaysDown = fgseaRes[padj < 0.05][head(order(NES), n=20), pathway]
+topPathwaysUp = fgseaRes[padj < 0.05][head(order(-NES), n=20), pathway]
+
+topPathways = c(topPathwaysUp, rev(topPathwaysDown))
+
+test_cluster = plotGseaTable(GMTs[topPathways], ranked_genes, fgseaRes, 
+              gseaParam=0.5) 
+```
+
+![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
+topPathwaysDesc = GMT_longdesc %>% filter(short_name %in% topPathways)
+View(topPathwaysDesc)
+
+fwrite(topPathwaysDesc, file = "toppathways.txt",sep="\t")
+
+
+topPathwaysDescUp = GMT_longdesc %>% filter(short_name %in% topPathwaysUp)
+fwrite(topPathwaysDescUp, file = "toppathwaysUp.txt",sep="\t")
+
+topPathwaysDescDn = GMT_longdesc %>% filter(short_name %in% topPathwaysDown)
+fwrite(topPathwaysDescDn, file = "toppathwaysDn.txt",sep="\t")
+```
+
+``` r
+### WIP, individual GSEA plots
+# 
+# GSEA_result_up = fgseaRes %>% filter(padj < 0.05) %>% arrange(desc(NES))
+# 
+# GSEA_result_down = fgseaRes %>% filter(padj < 0.05) %>% arrange(NES)
+# 
+# GSEA_result = GSEA_result_down
+# GSEA_result = GSEA_result_up
+# 
+# ###Single plot for GSEA:
+# GSEA_for_plot = GSEA_result[1,1]
+# 
+# plotEnrichment(GMTs[[GSEA_for_plot]], ranked_genes) +
+#   labs(title=names(GMTs[GSEA_for_plot]))
+# 
+# #Barcodeplot:
+# idx = ids2indices(AraPath_GMT,id=rownames(genelist))
+# test = genelist$logFC.treatmentDT
+# idx[[GSEA_for_plot]]
+# 
+# barcodeplot(test,
+#             index=idx[[GSEA_for_plot]],
+#             main=GSEA_for_plot)
+# 
+# #######facetwrap multiple gsea plots
 ```

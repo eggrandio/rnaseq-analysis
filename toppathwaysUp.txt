@@ -1,0 +1,21 @@
+short_name	long_desc
+LIT_AT_BLASING_3H-MANNITOL_UP	Induced-3h-mannitol (table s 6 pubmedid:16299223)
+LIT_AT_PESARESI_STN7-1PSAD1-1MUTANT_VS_WS-2_UP	Up-regulated in the stn7-1 psae1-3 mutant compared to ws-2. (table s7 pubmedid:19706797)
+LIT_AT_RUBIN_LBD38OX-N_VS_WT-N_DN	Down-regulated by lbd38ox -n vs. wt -n (dataset 1 pubmedid:19933203)
+LIT_AT_DELGADO-CEREZO_AGB1-1_VS_COL-0_PCBMM_1D_UP	Up_genes differentiallly regulated  in agb1-1  plants at 1 dpi with pcbmm compared with col-0 plants (Table S4; pubmedid: 21980142)
+LIT_AT_JAMBUNATHAN_ATNUDT7-1_VS_WT_12-3-1-POT-MIX_UP	Up_differentially expressed genes in atnudt7-1 versus wild-type plants growing in 12:3:1 potting mix (Table S1; pubmedid: 20704736)
+LIT_AT_VELLOSILLO_ROOT_9-HOT_VS_CONTROL_5D_DN	5d_dn_genes differentially expressed by 9-hot treatment in roots. (Table S1; pubmedid: 17369372)
+LIT_AT_FULTON_LER_VS_SLM_FLOWER_DN	dn,the 93 genes that show significant changes in expression level in all ler versus sub-like mutant (slm) comparisons. this list thus comprises the flower core target gene list (Suppl. Dataset 2; pubmedid: 19180193)
+LIT_AT_ASCENCIO-IBANEZ_EDS1PAD4-DEP_LEAF_DIFF	Eds1pad4-dep,comparisons to host pathogen pathway profiles (Table S4; pubmedid: 18650403)
+LIT_AT_SKIPSEY_FENCLORIM_VS_4-CHLORO-6-METHYL-2-PHENYLPYRIMIDINE_DN	Down-regulated -fenclorim vs. cmpp(4-chloro-6-methyl-2-phenylpyrimidine) (table s4; pubmedid:21778235).
+LIT_AT_CHANG_MOCK_SHOOT_OE_VS_COL-0_UP	Up-mock_shoot_oe/col-0---differentially regulated in at least one genotype relative to the other genotypes under either mock (control) or hypoxia conditions (moesm2; pubmedid:22086331).
+LIT_AT_LI_BIO4-1_VS_BIO4-1-D-BIOTIN_UP	Significantly upregulated in bio4-1/bio4-1 complemented with d-biotin (table s1a; pubmedid:22126457).
+LIT_AT_LI_BIO4-1_VS_WT_UP	Significantly and 2 fold upregulated in bio4-1 compared to wt. (table s1b; pubmedid:22126457).
+LIT_AT_SEGARRA_GROWN_PERLITE_BOTRYTIS-CINEREA_UP	Up-significant differentially expressed genes from arabidopsis plants grown in compost compared to plants grown in perlite (fc>1). (table s1; pubmedid:23405252).
+LIT_AT_PEREA-RESA_LSM1A-LSM1B-DOUBLE-MUTANT_UP	Up-regulated in the lsm1a lsm1b double mutant. (dataset s2b; pubmedid:23221597).
+LIT_AT_NG_AOX1A-REG-CONTEXT_H2O-V-AA_DIFF	Aox1a reg context --linear fold h2o v aa (table s6; pubmedid:23229550).
+LIT_AT_MARCHIVE_NITRATE_COL_T200_DN_NLP7-MUTANTS_WEAKER-OPPOSITE_DIFF	Down-genes that were differentially regulated by 20 min nitrate supply in the wt and that showed a weaker or opposite response to nitrate in the nlp7 mutants (dataset s4; pubmedid:23591880).
+LIT_AT_LI_RSA3-1_SALT-STRESS_UP	Genes with increased expression levels in rsa3-1 under salt stress as determined by microarray analysis. (table s2; pubmedid:23571490).
+LIT_AT_PRASCH_VIRUS-STRESSED-PLANT_VS_CON_UP	Up-differentially expressed features of virus stressed plants compared to control plants (table s2; pubmedid:23753177).
+COM_AT_WILSON_NMF_CLUSTER_5	Suppressed by pathogen. Clusters defined by non-negative matrix factorization by Wilson et al (to be published)
+COM_AT_WILSON_NMF_CLUSTER_7	Activated by Pathogen and light. Clusters defined by non-negative matrix factorization by Wilson et al (to be published)
