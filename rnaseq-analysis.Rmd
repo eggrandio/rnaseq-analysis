@@ -72,7 +72,7 @@ d0 = calcNormFactors(d0) #Re-calculate normalization factors after removing gene
 
 Select a cut-off to remove genes without or with low amount of reads mapped:
 
-```{r}
+```{r, fig.width = 6, fig.height = 6, fig.align="center"}
 #Use RPKM to define cutt-off value to remove noise of low expressed genes (see https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/)
 
 #Convert RPKM to long format data.frame
@@ -128,12 +128,30 @@ d = d0[-drop, ,keep.lib.sizes=FALSE] #More stringent criteria to remove genes wi
 d = calcNormFactors(d)
 ```
 
-Generate MDS plot:
+Generate PCA plot using filtered RPKM data:
 
-```{r}
-postscript(file="./output/MDSplot.ps",width=7.87, height=7.87)
-plotMDS(d, col = as.numeric(treatment))
-dev.off() # save plotted figure
+```{r, fig.width = 4, fig.height = 4, fig.align="center"}
+RPKM = (rpkm(d,log = T))
+RPKM_PCA = prcomp(t(RPKM))
+RPKM_PCA_PLOT = RPKM_PCA$x[,1:2]
+
+RPKM_PCA_PLOT = RPKM_PCA_PLOT %>% as.data.frame %>%
+  rownames_to_column("SampleID") %>%
+  separate(SampleID,into=c("treatment","replicate"), sep=2) %>% 
+  mutate_if(is.character, as.factor) %>% 
+  mutate(treatment = factor(treatment,levels = c("NT","WT","RT","DT"))) %>% 
+  as_tibble
+
+ggplot(data = RPKM_PCA_PLOT, aes(x = PC1, y = PC2, color = treatment)) + 
+  geom_point() +
+  labs(color = "Treatment") +
+  scale_color_jco() +
+  scale_fill_jco() +
+  theme_test() +
+  theme(aspect.ratio = 1)
+
+filename = "./output/PCAplot.svg"
+ggsave(filename, height = 3, width = 3)
 ```
 
 7- To compare all the samples to control:
@@ -167,6 +185,8 @@ tmp = AllvsCtrl$table %>% dplyr::select(c(logFC.treatmentWT,logFC.treatmentRT,lo
 
 Filtered_AllvsCtrl = Filtered_byFDR[tmp,]
 
+head(Filtered_AllvsCtrl$table)
+
 Filtered_AllvsCtrl_output = na.omit(rownames_to_column(Filtered_AllvsCtrl$table,"Gene"))
 
 write.table(Filtered_AllvsCtrl_output, file = paste0("./output/Filtered_AllvsCtrl.txt"), row.names=F, sep="\t", quote=F)
@@ -174,7 +194,7 @@ write.table(Filtered_AllvsCtrl_output, file = paste0("./output/Filtered_AllvsCtr
 
 8- Heatmap (using logFC):
 
-```{r}
+```{r, fig.width = 6, fig.height = 6, fig.align = "center"}
 ### Select genes that change specifically in DT (manually)
 data = Filtered_AllvsCtrl$table
 data = data[complete.cases(data),]
@@ -269,7 +289,7 @@ DE_GSEA = Filtered_AllvsCtrl$table[gnames_for_GSEA,]
 
 9- Marker genes from clusters:
 
-```{r}
+```{r, fig.width = 6, fig.height = 4, fig.align = "center"}
 ### RPKM data frame in long format:
 
 RPKM = (rpkm(d,log = T))

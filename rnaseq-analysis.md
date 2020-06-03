@@ -36,7 +36,7 @@ library(fgsea)
 library(gridtext)
 ```
 
-Calculate DGEList object (d) and calculate RPKM (outputs “RPKM.txt”
+6- Calculate DGEList object (d) and calculate RPKM (outputs “RPKM.txt”
 file):
 
 ``` r
@@ -138,7 +138,7 @@ plot = ggplot(Merged_list, aes(x=threshold,y=Genes_above_threshold,color=sample)
 plot
 ```
 
-![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+<img src="rnaseq-analysis_files/figure-gfm/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 In this case, we chose as cut-off 1 RPKM
 
@@ -152,18 +152,37 @@ d = d0[-drop, ,keep.lib.sizes=FALSE] #More stringent criteria to remove genes wi
 d = calcNormFactors(d)
 ```
 
-Generate MDS plot:
+Generate PCA plot using filtered RPKM data:
 
 ``` r
-postscript(file="./output/MDSplot.ps",width=7.87, height=7.87)
-plotMDS(d, col = as.numeric(treatment))
-dev.off() # save plotted figure
+RPKM = (rpkm(d,log = T))
+RPKM_PCA = prcomp(t(RPKM))
+RPKM_PCA_PLOT = RPKM_PCA$x[,1:2]
+
+RPKM_PCA_PLOT = RPKM_PCA_PLOT %>% as.data.frame %>%
+  rownames_to_column("SampleID") %>%
+  separate(SampleID,into=c("treatment","replicate"), sep=2) %>% 
+  mutate_if(is.character, as.factor) %>% 
+  mutate(treatment = factor(treatment,levels = c("NT","WT","RT","DT"))) %>% 
+  as_tibble
+
+ggplot(data = RPKM_PCA_PLOT, aes(x = PC1, y = PC2, color = treatment)) + 
+  geom_point() +
+  labs(color = "Treatment") +
+  scale_color_jco() +
+  scale_fill_jco() +
+  theme_test() +
+  theme(aspect.ratio = 1)
 ```
 
-    ## png 
-    ##   2
+<img src="rnaseq-analysis_files/figure-gfm/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
-To compare all the samples to control:
+``` r
+filename = "./output/PCAplot.svg"
+ggsave(filename, height = 3, width = 3)
+```
+
+7- To compare all the samples to control:
 
 ``` r
 design = model.matrix(~treatment)
@@ -194,12 +213,31 @@ tmp = AllvsCtrl$table %>% dplyr::select(c(logFC.treatmentWT,logFC.treatmentRT,lo
 
 Filtered_AllvsCtrl = Filtered_byFDR[tmp,]
 
+head(Filtered_AllvsCtrl$table)
+```
+
+    ##           Length logFC.treatmentWT logFC.treatmentRT logFC.treatmentDT   logCPM
+    ## AT1G21240   2422        2.96674871         3.7371969          8.059693 4.035865
+    ## AT3G15536    495        1.33337783         2.7300966          5.819152 2.281665
+    ## AT1G09932   1443        1.88438553         3.3242943          5.707507 3.360015
+    ## AT4G00700   3611        1.13613808         2.6300577          6.300830 4.405263
+    ## AT2G38860   2127       -0.07110813        -0.1787093          3.025977 5.621593
+    ## AT3G13950   1206        1.78454256         2.4608951          6.459634 2.503970
+    ##                  F       PValue          FDR
+    ## AT1G21240 576.7402 3.437391e-19 5.570980e-15
+    ## AT3G15536 473.0633 1.508623e-18 1.222513e-14
+    ## AT1G09932 385.8037 1.093145e-17 5.905536e-14
+    ## AT4G00700 396.3470 2.928449e-17 9.717734e-14
+    ## AT2G38860 360.9900 2.998005e-17 9.717734e-14
+    ## AT3G13950 338.3309 3.899023e-17 1.053191e-13
+
+``` r
 Filtered_AllvsCtrl_output = na.omit(rownames_to_column(Filtered_AllvsCtrl$table,"Gene"))
 
 write.table(Filtered_AllvsCtrl_output, file = paste0("./output/Filtered_AllvsCtrl.txt"), row.names=F, sep="\t", quote=F)
 ```
 
-Heatmap (using logFC):
+8- Heatmap (using logFC):
 
 ``` r
 ### Select genes that change specifically in DT (manually)
@@ -253,7 +291,7 @@ dend = as.dendrogram(hclust(as.dist(1- cor(t(x))),"complete"), hang=-1)
 dend %>% dendextend::set("branches_k_color", k = clusters, value = pal_jco()(clusters)) %>% plot(leaflab="none")
 ```
 
-![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+<img src="rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 ``` r
 #Create annotation block for heatmap
@@ -287,7 +325,7 @@ Heatmap(x,
         column_names_max_height = unit(6, "cm"))
 ```
 
-![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+<img src="rnaseq-analysis_files/figure-gfm/unnamed-chunk-7-2.png" style="display: block; margin: auto;" />
 
 ``` r
 ###Select interesting clusters based on the heatmap
@@ -302,7 +340,7 @@ gnames_for_GSEA = c(gnames_UPGENES,gnames_DNGENES)
 DE_GSEA = Filtered_AllvsCtrl$table[gnames_for_GSEA,]
 ```
 
-Marker genes from clusters:
+9- Marker genes from clusters:
 
 ``` r
 ### RPKM data frame in long format:
@@ -382,16 +420,16 @@ ggplot(data = oDTf, aes(x = GeneID, y = RPKM, fill = treatment)) +
   theme_classic()
 ```
 
-![](rnaseq-analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+<img src="rnaseq-analysis_files/figure-gfm/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 ``` r
 filename = paste0("./output/boxplot_",ngenes,"genes.svg")
 ggsave(filename)
 ```
 
-    ## Saving 7 x 5 in image
+    ## Saving 6 x 4 in image
 
-GSEA analysis:
+10- GSEA analysis:
 
 ``` r
 ###Prepare GMT file and experiment descriptions:
