@@ -34,7 +34,7 @@ library(fgsea)
 library(gridtext)
 ```
 
-Calculate DGEList object (d) and calculate RPKM (outputs "RPKM.txt" file):
+6- Calculate DGEList object (d) and calculate RPKM (outputs "RPKM.txt" file):
 
 ```{r}
 library(edgeR)
@@ -136,7 +136,7 @@ plotMDS(d, col = as.numeric(treatment))
 dev.off() # save plotted figure
 ```
 
-To compare all the samples to control:
+7- To compare all the samples to control:
 
 ```{r}
 design = model.matrix(~treatment)
@@ -172,7 +172,7 @@ Filtered_AllvsCtrl_output = na.omit(rownames_to_column(Filtered_AllvsCtrl$table,
 write.table(Filtered_AllvsCtrl_output, file = paste0("./output/Filtered_AllvsCtrl.txt"), row.names=F, sep="\t", quote=F)
 ```
 
-Heatmap (using logFC):
+8- Heatmap (using logFC):
 
 ```{r}
 ### Select genes that change specifically in DT (manually)
@@ -267,7 +267,7 @@ gnames_for_GSEA = c(gnames_UPGENES,gnames_DNGENES)
 DE_GSEA = Filtered_AllvsCtrl$table[gnames_for_GSEA,]
 ```
 
-Marker genes from clusters:
+9- Marker genes from clusters:
 
 ```{r}
 ### RPKM data frame in long format:
@@ -350,7 +350,7 @@ filename = paste0("./output/boxplot_",ngenes,"genes.svg")
 ggsave(filename)
 ```
 
-GSEA analysis:
+10- GSEA analysis:
 
 ```{r}
 ###Prepare GMT file and experiment descriptions:
