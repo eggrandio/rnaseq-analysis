@@ -19,7 +19,7 @@ Data preprocessing (done remotely in usegalaxy.org)
 Based on https://ucdavis-bioinformatics-training.github.io/2019_March_UCSF_mRNAseq_Workshop/
 
 Load required libraries:
-```{r eval = FALSE}
+```{r eval = FALSE, message = FALSE}
 library(edgeR)
 library(biomaRt)
 library(data.table)
