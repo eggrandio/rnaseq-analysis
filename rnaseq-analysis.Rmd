@@ -45,7 +45,8 @@ feature.length="./data/Feature_length.txt"
 
 counts = read.delim(input, row.names = 1) #read output from FeatureCounts
 head(counts)
-GeneLength = (read.delim(feature.length, row.names = 1)) #read file with length of genes to calculate RPKM, Make sure they are in the same order as the counts file
+GeneLength = (read.delim(feature.length, row.names = 1)) #read file with length of genes to calculate RPKM
+#Make sure GeneIDs are in the same order as the counts file
 
 snames = colnames(counts)
 treatment = as.factor(substr(snames, 1, 2))
