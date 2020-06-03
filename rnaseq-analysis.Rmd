@@ -388,14 +388,14 @@ test_cluster = plotGseaTable(GMTs[topPathways], ranked_genes, fgseaRes,
 topPathwaysDesc = GMT_longdesc %>% filter(short_name %in% topPathways)
 View(topPathwaysDesc)
 
-fwrite(topPathwaysDesc, file = "toppathways.txt",sep="\t")
+fwrite(topPathwaysDesc, file = "./output/toppathways.txt",sep="\t")
 
 
 topPathwaysDescUp = GMT_longdesc %>% filter(short_name %in% topPathwaysUp)
-fwrite(topPathwaysDescUp, file = "toppathwaysUp.txt",sep="\t")
+fwrite(topPathwaysDescUp, file = "./output/toppathwaysUp.txt",sep="\t")
 
 topPathwaysDescDn = GMT_longdesc %>% filter(short_name %in% topPathwaysDown)
-fwrite(topPathwaysDescDn, file = "toppathwaysDn.txt",sep="\t")
+fwrite(topPathwaysDescDn, file = "./output/toppathwaysDn.txt",sep="\t")
 ```
 
 ```{r}
