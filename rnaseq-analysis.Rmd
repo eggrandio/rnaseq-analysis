@@ -14,13 +14,12 @@ Data preprocessing (done remotely in usegalaxy.org)
 
 4- Count reads per annotated gene (FeatureCounts): outputs "Feature_count.txt" and "feature_length.tabular" files
 
-5- Compare expression between samples (edgeR):
-
+5- Compare expression between samples (DESeq2):
 
 Based on https://ucdavis-bioinformatics-training.github.io/2019_March_UCSF_mRNAseq_Workshop/
 
 Load required libraries:
-```{r eval = FALSE}
+```{r}
 library(edgeR)
 library(biomaRt)
 library(data.table)
@@ -35,3 +34,4 @@ library(splitstackshape)
 library(stringr)
 library(fgsea)
 library(gridtext)
+```
