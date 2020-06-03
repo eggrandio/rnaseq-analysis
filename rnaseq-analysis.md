@@ -1,35 +1,40 @@
 RNAseq analysis
 ================
 Eduardo González-Grandío
-2 de junio de 2020
+June 2nd, 2020
 
-## R Markdown
+Data preprocessing (done remotely in usegalaxy.org)
 
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
+1- Trim low quality bases (Trimmomatic)
 
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
+2- Align paired-end reads (HISAT2)
+
+3- Remove reads that do not map, map to several regions or are unpaired
+(Filter BAM)
+
+4- Count reads per annotated gene (FeatureCounts): outputs
+“Feature\_count.txt” and “feature\_length.tabular” files
+
+5- Compare expression between samples (edgeR):
+
+Based on
+<https://ucdavis-bioinformatics-training.github.io/2019_March_UCSF_mRNAseq_Workshop/>
+
+Load required libraries:
 
 ``` r
-summary(cars)
+library(edgeR)
+library(biomaRt)
+library(data.table)
+library(org.At.tair.db)
+library(dendextend)
+library(WebGestaltR)
+library(ComplexHeatmap)
+library(pals)
+library(ggsci)
+library(tidyverse)
+library(splitstackshape)
+library(stringr)
+library(fgsea)
+library(gridtext)
 ```
-
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
-
-## Including Plots
-
-You can also embed plots, for example:
-
-![](rnaseq-analysis_files/figure-gfm/pressure-1.png)<!-- -->
-
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
